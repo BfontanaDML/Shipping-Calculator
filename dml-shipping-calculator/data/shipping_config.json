@@ -1,0 +1,155 @@
+{
+  "config_version": "2026-10-07.4",
+  "description": "DML Shipping Calculator data. Box dimensions and per-product capacities come from the 'Shipping Calculator' workbook (product sheets Caps, TK3, EK9, EK12 and EK64, rows 6-11). The employee-facing names are Toques (TK3 sheet) and EK60 (EK64 sheet). Dimensional weight is calculated from the whole-inch box dimensions; the workbook's own weight estimates are kept only as historical audit data. The app validates this file at start-up. See AUDIT.md before changing capacity statuses.",
+  "pricing": {
+    "currency": "CAD",
+    "markup_on_cost_rate": "0.25",
+    "rounding": "ROUND_HALF_UP to the cent (customer shipping price, per piece)",
+    "default_service_label": "UPS Standard"
+  },
+  "dimensional_weight": {
+    "service_scope": "UPS non-air services only (for example UPS Standard or UPS Ground)",
+    "divisor_in3_per_lb": 139,
+    "rounding": "L x W x H in whole inches / divisor, rounded up to the next whole pound",
+    "measured_weight_rounding": "actual measured weight rounded up to the next whole pound",
+    "quoting_guidance": "greater of dimensional weight and rounded-up measured weight, per box",
+    "source": "UPS Canada, Package Dimensions, Size Limits and Weight Guide (ups.com/ca), checked 2026-10-07"
+  },
+  "limits": {
+    "max_quantity": 100000,
+    "max_box_rows_per_line": 50,
+    "max_boxes_per_row": 100000,
+    "max_measured_weight_lb": "999",
+    "ups_package_weight_limit_lb": "150",
+    "max_price_cad": "1000000"
+  },
+  "boxes": [
+    {
+      "id": "sample_11x9x8",
+      "label": "Sample box",
+      "dims_in": [11, 9, 8],
+      "workbook_est_weight_lb": "6",
+      "source": "Caps!C6:I6 'New Sample Box' (same on every product sheet)"
+    },
+    {
+      "id": "catalog_13x11x7",
+      "label": "Catalog / cap box",
+      "dims_in": [13, 11, 7],
+      "workbook_est_weight_lb": "7",
+      "source": "Caps!C7:I7 'Catalog/ Cap Box' (same on every product sheet)"
+    },
+    {
+      "id": "box_23x9x7",
+      "label": "Small carton",
+      "dims_in": [23, 9, 7],
+      "workbook_est_weight_lb": "10",
+      "source": "Caps!C8:I8 '2 Doz' (workbook length has a decimal; approved length 23 in; see AUDIT.md)"
+    },
+    {
+      "id": "box_24x10x14",
+      "label": "Medium carton",
+      "dims_in": [24, 10, 14],
+      "workbook_est_weight_lb": "24",
+      "source": "Caps!C9:I9 '4 Doz'"
+    },
+    {
+      "id": "box_24x10x20",
+      "label": "Large carton",
+      "dims_in": [24, 10, 20],
+      "workbook_est_weight_lb": "35",
+      "source": "Caps!C10:I10 '6 Doz'"
+    },
+    {
+      "id": "master_24x19x20",
+      "label": "Master carton",
+      "dims_in": [24, 19, 20],
+      "workbook_est_weight_lb": "66",
+      "source": "Caps!C11:I11 '12 Doz'"
+    }
+  ],
+  "capacity_status_legend": {
+    "approved": "Capacity confirmed in the approved release table. Used for automatic suggestions.",
+    "auto_audited": "Small box whose product capacity was audited as consistent with the workbook and packaging specs. Used for automatic suggestions.",
+    "unconfirmed": "Workbook lists a capacity, but it appears to be a generic value copied across sheets and was not confirmed for this product. Never suggested automatically; a PM may select it manually and the quote is flagged.",
+    "conflict": "Workbook capacity contradicts the product's other data. Cannot be selected until DML sets a confirmed capacity here and changes the status."
+  },
+  "products": [
+    {
+      "id": "caps",
+      "name": "Caps",
+      "workbook_sheet": "Caps",
+      "capacities": {
+        "sample_11x9x8":   {"capacity": 6,   "status": "auto_audited", "source": "Caps!D6",
+                            "note": "Packaging specs list this box under caps for 1-6 pcs."},
+        "catalog_13x11x7": {"capacity": 12,  "status": "auto_audited", "source": "Caps!D7",
+                            "note": "Box is named 'Catalog/ Cap Box'; packaging specs list it for 7-12 pcs."},
+        "box_23x9x7":      {"capacity": 24,  "status": "approved", "source": "Caps!D8",
+                            "note": "Workbook also shows 'Up to' 28 for this box; not used (see AUDIT.md)."},
+        "box_24x10x14":    {"capacity": 48,  "status": "approved", "source": "Caps!D9"},
+        "box_24x10x20":    {"capacity": 72,  "status": "approved", "source": "Caps!D10"},
+        "master_24x19x20": {"capacity": 144, "status": "approved", "source": "Caps!D11"}
+      }
+    },
+    {
+      "id": "toques",
+      "name": "Toques",
+      "workbook_sheet": "TK3",
+      "capacities": {
+        "sample_11x9x8":   {"capacity": 6,   "status": "unconfirmed", "source": "TK3!D6",
+                            "note": "Same 6 as every product sheet; not a Toques-specific figure."},
+        "catalog_13x11x7": {"capacity": 12,  "status": "unconfirmed", "source": "TK3!D7",
+                            "note": "Same 12 as every product sheet; far below the 72 that fit 23 x 9 x 7, so likely not measured for Toques."},
+        "box_23x9x7":      {"capacity": 72,  "status": "approved", "source": "TK3!D8"},
+        "box_24x10x14":    {"capacity": 144, "status": "approved", "source": "TK3!D9"},
+        "box_24x10x20":    {"capacity": 216, "status": "approved", "source": "TK3!D10"},
+        "master_24x19x20": {"capacity": 432, "status": "approved", "source": "TK3!D11"}
+      }
+    },
+    {
+      "id": "ek9",
+      "name": "EK9",
+      "workbook_sheet": "EK9",
+      "capacities": {
+        "sample_11x9x8":   {"capacity": 6,   "status": "unconfirmed", "source": "EK9!D6",
+                            "note": "Same 6 as every product sheet; not an EK9-specific figure."},
+        "catalog_13x11x7": {"capacity": 12,  "status": "unconfirmed", "source": "EK9!D7",
+                            "note": "Same 12 as every product sheet; not an EK9-specific figure."},
+        "box_23x9x7":      {"capacity": 36,  "status": "approved", "source": "EK9!D8"},
+        "box_24x10x14":    {"capacity": 72,  "status": "approved", "source": "EK9!D9"},
+        "box_24x10x20":    {"capacity": 108, "status": "approved", "source": "EK9!D10"},
+        "master_24x19x20": {"capacity": 216, "status": "approved", "source": "EK9!D11"}
+      }
+    },
+    {
+      "id": "ek12",
+      "name": "EK12",
+      "workbook_sheet": "EK12",
+      "capacities": {
+        "sample_11x9x8":   {"capacity": 6,   "status": "unconfirmed", "source": "EK12!D6",
+                            "note": "Same 6 as every product sheet; not an EK12-specific figure."},
+        "catalog_13x11x7": {"capacity": 12,  "status": "unconfirmed", "source": "EK12!D7",
+                            "note": "12 is close to the volume-proportional limit (about 12.4) implied by 18 in 23 x 9 x 7; needs a physical check."},
+        "box_23x9x7":      {"capacity": 18,  "status": "approved", "source": "EK12!D8",
+                            "note": "Workbook also shows 'Up to' 24 for this box; not used (see AUDIT.md)."},
+        "box_24x10x14":    {"capacity": 36,  "status": "approved", "source": "EK12!D9"},
+        "box_24x10x20":    {"capacity": 54,  "status": "approved", "source": "EK12!D10"},
+        "master_24x19x20": {"capacity": 108, "status": "approved", "source": "EK12!D11"}
+      }
+    },
+    {
+      "id": "ek60",
+      "name": "EK60",
+      "workbook_sheet": "EK64",
+      "capacities": {
+        "sample_11x9x8":   {"capacity": null, "workbook_capacity": 6,  "status": "conflict", "source": "EK64!D6",
+                            "note": "Workbook says 6, but the sample box has about 55% of the volume of 23 x 9 x 7, which holds only 9 EK60 (about 4.9 by volume)."},
+        "catalog_13x11x7": {"capacity": null, "workbook_capacity": 12, "status": "conflict", "source": "EK64!D7",
+                            "note": "Workbook says 12, but the larger 23 x 9 x 7 box holds only 9 EK60."},
+        "box_23x9x7":      {"capacity": 9,   "status": "approved", "source": "EK64!D8"},
+        "box_24x10x14":    {"capacity": 18,  "status": "approved", "source": "EK64!D9"},
+        "box_24x10x20":    {"capacity": 27,  "status": "approved", "source": "EK64!D10"},
+        "master_24x19x20": {"capacity": 54,  "status": "approved", "source": "EK64!D11"}
+      }
+    }
+  ]
+}

@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DML Shipping Calculator</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}?v={{ app_version }}">
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        {% if tools_home %}<a class="crumb" href="{{ tools_home }}">DML Tools</a>{% else %}<span class="crumb">DML Tools</span>{% endif %}
+        <span class="crumb-sep">/</span>
+        <h1>Shipping Calculator</h1>
+      </div>
+      <span class="ver">v{{ app_version }}</span>
+    </div>
+  </header>
+
+  <main class="wrap" id="app" data-api="{{ url_for('index') }}api/">
+    <noscript><p class="err">This tool needs JavaScript enabled.</p></noscript>
+
+    <section class="card" aria-labelledby="h-ship">
+      <h2 id="h-ship"><span class="step">1</span> Shipment</h2>
+      <div class="field">
+        <span class="label" id="lbl-product">Product</span>
+        <div class="segmented" id="product" role="radiogroup" aria-labelledby="lbl-product"></div>
+        <p class="err" data-err="product"></p>
+      </div>
+      <div class="field">
+        <label class="label" for="quantity">Quantity</label>
+        <div class="with-unit"><input id="quantity" type="text" inputmode="numeric" autocomplete="off" placeholder="e.g. 144"><span>pcs</span></div>
+        <p class="err" data-err="quantity"></p>
+      </div>
+      <div class="field">
+        <span class="label" id="lbl-service">UPS service</span>
+        <div class="segmented" id="service" role="radiogroup" aria-labelledby="lbl-service"></div>
+        <p class="err" data-err="service"></p>
+      </div>
+    </section>
+
+    <section class="card" aria-labelledby="h-boxes">
+      <h2 id="h-boxes"><span class="step">2</span> Boxes</h2>
+      <p class="hint" id="boxes-empty">Choose a product and enter a quantity.</p>
+      <div id="boxes-area" hidden>
+        <div class="table-scroll">
+          <table class="boxes" id="boxes">
+            <thead><tr>
+              <th scope="col">Boxes</th>
+              <th scope="col">Box (L × W × H in)</th>
+              <th scope="col">Pcs per box</th>
+              <th scope="col" class="wcol">Dim. weight</th>
+              <th scope="col">Measured weight</th>
+              <th scope="col" class="wcol">Quote weight</th>
+              <th scope="col"><span class="sr">Remove</span></th>
+            </tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="boxes-foot">
+          <div>
+            <span id="totals"></span>
+            <p class="err inline" data-err="packing"></p>
+          </div>
+          <div class="links">
+            <button type="button" class="link-btn" id="add-row">+ Add row</button>
+            <button type="button" class="link-btn" id="reset-rows">Reset to suggestion</button>
+          </div>
+        </div>
+        <p class="hint" id="weight-hint"></p>
+      </div>
+    </section>
+
+    <section class="card" aria-labelledby="h-price">
+      <h2 id="h-price"><span class="step">3</span> Price</h2>
+      <div class="price-row">
+        <div class="field">
+          <label class="label" for="ups-total">Discounted UPS Total Cost (CAD)</label>
+          <div class="with-unit money"><span>$</span><input id="ups-total" type="text" inputmode="decimal" autocomplete="off" placeholder="0.00"></div>
+          <p class="err" data-err="ups_total_cost"></p>
+        </div>
+        <details class="howto" id="howto">
+          <summary>How to Get Shipping Prices</summary>
+          <ol>
+            <li><a href="{{ ups_url }}" target="_blank" rel="noopener noreferrer">Open the UPS website</a> and sign in with the DML UPS login:
+              <dl class="login">
+                <dt>User ID</dt><dd><code id="ups-user">UPSMPDM</code></dd>
+                <dt>Password</dt><dd><code id="ups-pass">Creation11</code></dd>
+              </dl>
+            </li>
+            <li>Open <strong>Shipping → Calculate Shipping Cost</strong>.</li>
+            <li>Select <strong>Cap America</strong> as the shipping origin.</li>
+            <li>Enter the destination postal code, set the customs value to <strong>$1</strong>, and click <strong>Update</strong>.</li>
+            <li>Enter every package from Step 2 (dimensions and weight), then click <strong>Update</strong>. If Step 2 lists multiple boxes, include all of them.</li>
+            <li>Under <strong>How will you pay the shipping charges?</strong>, choose DML’s UPS account number from the <strong>Select a UPS Account Number</strong> dropdown, then click <strong>Update</strong>.</li>
+            <li>Select the UPS service chosen in Step 1.</li>
+            <li>Copy the discounted <strong>Total Cost</strong> for the complete shipment into Step 3.</li>
+          </ol>
+        </details>
+      </div>
+      <p class="hint" id="rates-note" hidden></p>
+      <div class="results" aria-live="polite">
+        <div class="result">
+          <span class="r-label">Customer Shipping Price</span>
+          <span class="r-value" id="r-total">—</span>
+        </div>
+        <div class="result">
+          <span class="r-label">Shipping Price Per Piece</span>
+          <span class="r-value" id="r-piece">—</span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="{{ url_for('static', filename='app.js') }}?v={{ app_version }}"></script>
+</body>
+</html>
